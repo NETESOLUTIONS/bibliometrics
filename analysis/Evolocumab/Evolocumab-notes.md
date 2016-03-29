@@ -7,6 +7,37 @@ As of July 30, 2015, evolocumab (Repatha) has not been approved by FDA, but ther
 Added the following link on 3/29. 
 * http://www.accessdata.fda.gov/scripts/cder/drugsatfda/index.cfm?fuseaction=Search.Label_ApprovalHistory#apphist
 
+I start with a txt file edied in emacs into which I paste references line by line from the Medical Review document. This file is named evolocumab3. I manually number the files and edit out the umlaut and diacritics etc. Then I preprocess with sed, e.g.
+
+``` cat evolocumab3  | sed -E 's/^[0-9]{1,2}\./+/' | sed -E '/^\s*$/d' > evolocumab4```
+
+and import into R as a two column dataframe (df)
+
+``` df <- read.csv("~/evolocumab4",header=FALSE,sep="+", stringsAsFactors=FALSE)
+colnames(df) <- c("blank","cit_text")
+#### use dplyr to clean up null values and add a new cleaned up column "cit_text"
+library(dplyr)
+df <- df %>% select(cit_text) %>% mutate(ncit_text=ifelse(cit_text=="","BINGO",cit_text))
+#### and then run the nplcit\_pubmed\_search function I wrote
+nplcit_pubmed_search(substring(t$ncit_text,1,220))
+#### which generates a list of vectors. This protocol needs some fine tuning.
+```
+nplcit_pubmed_search <- function (x)	{
+print(length(x))
+nplcit_list <- vector("list",length(x))
+library(rentrez)
+for (i in 1:length(x)){	
+t<- entrez_search(db="pubmed", term=x[i],retstart=0,retmax=3)	
+nplcit_list[[i]] <- t$ids	
+print(i)
+print(t$ids)
+rm(t)
+}
+print(nplcit_list)
+return(nplcit_list)
+}
+``` 
+
 ####Evolocumab-core.pklz
 ```
 python src/topdown.py --format cse --levels 2 input/Evolocumab-FDA-NDA-Medical.txt output/Evolocumab-core.pklz
