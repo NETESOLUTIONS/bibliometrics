@@ -17,10 +17,12 @@ In R
 ``` df <- read.csv("~/evolocumab4",header=FALSE,sep="+", stringsAsFactors=FALSE)
 colnames(df) <- c("blank","cit_text")
 library(dplyr)
-df <- df %>% select(cit_text) %>% mutate(ncit_text=ifelse(cit_text=="","BINGO",cit_text))
-#### and then run the nplcit\_pubmed\_search function I wrote
-nplcit_pubmed_search(substring(t$ncit_text,1,220))
-#### which generates a list of vectors. This protocol needs some fine tuning.
+df <- df %>% select(cit_text) %>% mutate(ncit_text=ifelse(cit_text=="","BINGO",cit_text))```
+and then run the nplcit\_pubmed\_search function I wrote
+```nplcit_pubmed_search(substring(t$ncit_text,1,220))```
+
+which generates a list of vectors. This protocol needs some fine tuning.
+
 ```
 nplcit_pubmed_search <- function (x)	{
 print(length(x))
