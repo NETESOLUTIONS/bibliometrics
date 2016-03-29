@@ -4,10 +4,12 @@ As of July 30, 2015, evolocumab (Repatha) has not been approved by FDA, but ther
 * http://www.fda.gov/downloads/AdvisoryCommittees/CommitteesMeetingMaterials/Drugs/EndocrinologicandMetabolicDrugsAdvisoryCommittee/UCM450072.pdf
 * http://www.amgen.com/media/news-releases/2014/11/fda-accepts-amgens-biologics-license-application-for-ldl-cholesterollowering-medication-evolocumab/
 
-Added the following link on 3/29. 
+Evolocumab has since been approved and so the following link was added on 3/29/2016 
 * http://www.accessdata.fda.gov/scripts/cder/drugsatfda/index.cfm?fuseaction=Search.Label_ApprovalHistory#apphist
 
-I start with a txt file edied in emacs into which I paste references line by line from the Medical Review document. This file is named evolocumab3. I manually number the files and edit out the umlaut and diacritics etc. Then I preprocess with sed and import into R as a two column dataframe (df), use dplyr to clean up null values and add a new cleaned up column "ncit_text"
+In general, it appears that before approval, Advisory Committee notes are more useful to scrape citations of influential papers  and maybe after approval too. Human judgement is also critical in identifying foundational publications. 
+
+I start with a txt file edied in emacs into which I paste references copied one a time from the Medical Review document (or the Advisory Committee re. This file is named evolocumab3. I manually number the files and edit out the umlaut and diacritics etc. Then I preprocess with sed and import into R as a two column dataframe (df), use dplyr to clean up null values and add a new cleaned up column "ncit_text"
 
 In bash
 
