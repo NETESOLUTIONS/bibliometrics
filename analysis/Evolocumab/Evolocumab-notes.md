@@ -3,6 +3,7 @@ As of July 30, 2015, evolocumab (Repatha) has not been approved by FDA, but ther
 * https://clinicaltrials.gov/ct2/results?term=evolocumab&Search=Search
 * http://www.fda.gov/downloads/AdvisoryCommittees/CommitteesMeetingMaterials/Drugs/EndocrinologicandMetabolicDrugsAdvisoryCommittee/UCM450072.pdf
 * http://www.amgen.com/media/news-releases/2014/11/fda-accepts-amgens-biologics-license-application-for-ldl-cholesterollowering-medication-evolocumab/
+* http://www.accessdata.fda.gov/scripts/cder/drugsatfda/index.cfm?fuseaction=Search.Label_ApprovalHistory#apphist
 
 ####Evolocumab-core.pklz
 ```
