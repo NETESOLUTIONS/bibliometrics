@@ -34,17 +34,32 @@ copy (select * from temp_repatha3) to '/tmp/tr3.csv' DELIMITER ',' CSV HEADER;
 
 -- copy tr4 back into server at /tmp and edt header in emacs to get serial_no (sno) columnheader;
 
-drop table if exists temp_repatha4;
-create table temp_repatha4 (sno int, source_id varchar, cited_source_uid varchar, clean varchar);
-copy temp_repatha4 from '/tmp/tr4.csv' DELIMITER ',' CSV HEADER;
+-- Clean WOS IDs.
 
+\echo ***Cleaning WOS IDs on temp_repatha3...
+update temp_repatha3
+  set cited_source_uid =
+  (
+    case when cited_source_uid like 'WOS%'
+           then substring(cited_source_uid, 1, 19)
+         when cited_source_uid like 'MED%' or cited_source_uid like 'NON%' or
+         cited_source_uid like 'CSC%' or cited_source_uid like 'INS%' or
+         cited_source_uid like 'BCI%' or cited_source_uid=''
+           then cited_source_uid
+         else substring('WOS:'||cited_source_uid, 1, 19)
+    end
+  );
+
+--drop table if exists temp_repatha4;
+--create table temp_repatha4 (sno int, source_id varchar, cited_source_uid varchar, clean varchar);
+--copy temp_repatha4 from '/tmp/tr4.csv' DELIMITER ',' CSV HEADER;
 -- get pmids back from the cited_source_uids
 
-drop table if exists temp_repatha5;
-create table temp_repatha5 as  select a.*,b.pmid,b.pmid_int  from temp_repatha4 a LEFT JOIN wos_pmid_mapping b on a.clean=b.wos_uid;
+drop table if exists temp_repatha4;
+create table temp_repatha4 as  select a.*,b.pmid,b.pmid_int  from temp_repatha4 a LEFT JOIN wos_pmid_mapping b on a.clean=b.wos_uid;
 -- pick up the extra MEDLINE ones as well 
-update temp_repatha5 set pmid=clean where substring(clean,1,8)='MEDLINE:';
-update temp_repatha5 set pmid_int=substring(pmid,9)::int  where substring(clean,1,8)='MEDLINE:';
+update temp_repatha4 set pmid=clean where substring(clean,1,8)='MEDLINE:';
+update temp_repatha4 set pmid_int=substring(pmid,9)::int  where substring(clean,1,8)='MEDLINE:';
 
 -- get SPIRES data when Shixin loads spires_pub_projects
 
