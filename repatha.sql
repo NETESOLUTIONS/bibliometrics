@@ -56,7 +56,7 @@ update temp_repatha3
 -- get pmids back from the cited_source_uids
 
 drop table if exists temp_repatha4;
-create table temp_repatha4 as  select a.*,b.pmid,b.pmid_int  from temp_repatha4 a LEFT JOIN wos_pmid_mapping b on a.clean=b.wos_uid;
+create table temp_repatha4 as  select a.*,b.pmid,b.pmid_int  from temp_repatha3 a LEFT JOIN wos_pmid_mapping b on a.clean=b.wos_uid;
 -- pick up the extra MEDLINE ones as well 
 update temp_repatha4 set pmid=clean where substring(clean,1,8)='MEDLINE:';
 update temp_repatha4 set pmid_int=substring(pmid,9)::int  where substring(clean,1,8)='MEDLINE:';
