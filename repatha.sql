@@ -9,7 +9,7 @@ copy temp_repatha1 from '/tmp/repatha_seedset.csv' DELIMITER ',' CSV HEADER;
 
 \echo primary matches against SPIRES
 drop table if exists temp_repatha_primary;
-create table temp_repatha_primary as select a.uid,b.full_project_num_dc,b.admin_phs_org_code,b.match_case,b.external_org_id,b.index_name 
+create table temp_repatha_primary as select a.uid as pmid ,b.full_project_num_dc,b.admin_phs_org_code,b.match_case,b.external_org_id,b.index_name 
 from temp_repatha1 a LEFT JOIN spires_pub_projects b on a.uid=b.pmid;
 
 -- join pmids on wos_mapping to get wos_uid aka source_id
