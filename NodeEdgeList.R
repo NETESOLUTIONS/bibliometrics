@@ -19,10 +19,12 @@ n5 <- temp_repatha_primary %>% select(full_project_num_dc) %>% filter(full_proje
 colnames(n5) <- c("nodeID","ntype")
 n6 <- temp_repatha_secondary %>% select(full_project_num_dc) %>% filter(full_project_num_dc!="") %>% mutate(ntype="grant")
 colnames(n6) <- c("nodeID","ntype")
-nodelist <- rbind(n2,n3,n4,n5,n6)
+n7 <- rbind(e7,e8)
+n7 %>% select(target) %>% mutate(ntype="inst") %>% unique() %>% nrow()
+colnames(n7) <-c("nodeID","ntype")
+nodelist <- rbind(n2,n3,n4,n5,n6,m7)
 nodelist <- nodelist %>% unique()
 
-nodelist <- rbind(n2,n3,n4)
 # suppress duplicates
 nodelist <- nodelist %>% unique()
 
@@ -42,7 +44,13 @@ colnames(e4) <- c("source","target")
 # secondary pmids to grants
 e5 <- temp_repatha_secondary %>% select(pmid_output,full_project_num_dc) %>% filter(full_project_num_dc!="") %>% unique()
 colnames(e5) <- c("source","target")
-edgelist <- rbind(e1,e2,e3,e4,e5)
+e6 <- temp_repatha_primary %>% select(pmid,external_org_id) %>% filter(!is.na(external_org_id)) %>% unique()
+colnames(e6) <- c("source","target")
+e7 <- temp_repatha_secondary %>% select(pmid_output,external_org_id) %>% filter(!is.na(external_org_id)) %>% unique() %>% mutate(pEOI=paste("i",external_org_id,sep="")) %>% select(pmid_output,pEOI)
+colnames(e7) <- c("source","target")
+e8 <- temp_repatha_primary %>% select(pmid,external_org_id) %>% filter(!is.na(external_org_id)) %>% unique() %>% mutate(pEOI=paste("i",external_org_id,sep="")) %>% select(pmid,pEOI)
+colnames(e8) <- c("source","target")
+edgelist <- rbind(e1,e2,e3,e4,e5,e6,e7,e8)
 
 # Export
 write.csv(nodelist,file="~/Desktop/nodelist.csv")
