@@ -2,6 +2,8 @@
 -- George Chacko 4/3/2016
 
 -- load seedset of 59 pmids from R environment exported as repatha_seedset.csv
+-- the R script is seedset.R, the source file is ev_fda_foundational, the output is ev_fda_seedset
+
 \echo loading seedset pmids ***
 drop table if exists temp_repatha1;
 create table temp_repatha1 (sno int, uid int, pubdate varchar, lastauthor varchar, source varchar, title varchar, year int);
@@ -75,7 +77,8 @@ update temp_repatha4 set pmid_output=substring(pmid,9)::int  where substring(cit
 -- get SPIRES data when Shixin loads spires_pub_projects
 \echo mapping pmid output to SPIRES for grants data***
 drop table if exists temp_repatha5;
-create table temp_repatha5 as select a.*,b.full_project_num_dc,b.admin_phs_org_code,b.match_case,b.external_org_id,b.index_name from temp_repatha4 a 
+create table temp_repatha5 as select a.*,b.full_project_num_dc,b.admin_phs_org_code,b.match_case,b.external_org_id,b.index_name 
+from temp_repatha4 a 
 LEFT JOIN spires_pub_projects b on a.pmid_output=b.pmid;
 
 
