@@ -1,26 +1,82 @@
 -- batch file for repatha test case some stages procedures are quite manual
--- George Chacko 4/11/2016
+-- George Chacko 4/14/2016
 
+--PATENT BRANCH
+-- Find relevant patent numbers by the method of Google
+-- then search for these number in uspto_patents and Derwent tables
+-- select patent_num from uspto_patents where patent_num like '%8871913' or patent_num like '%8871914';
+-- returns
+-- patent_num
+-- ------------
+--  08871913
+--  08871914
+-- search aaain with correct numbers for cited patents and cited literature
+
+\echo create patents awarded to drug***
+drop table if exists temp_repatha_patents_g1;
+create table temp_repatha_patents_g1 (drug varchar,patent_num_orig varchar);
+insert into temp_repatha_patents_g1 values ('Repatha','08871913');
+insert into temp_repatha_patents_g1 values ('Repatha','08871914');
+
+\echo getting patents cited by Repatha patents (G2) 
+drop table if exists temp_repatha_patents_g2;
+create table temp_repatha_patents_g2 as select patent_num_orig, cited_patent_orig 
+from derwent_pat_citations 
+where patent_num_orig 
+in (select patent_num_orig from temp_repatha_patents_g1);
+
+-- note patent_num_orig and cited_patent_orig are combined into drug_patents
+\echo combining into single list of patent_numbers aka drug_patents***
+drop table if exists temp_repatha_patents_combined;
+create table temp_repatha_patents_combined as select cited_patent_orig as drug_patents from temp_repatha_patents_g2;
+insert into temp_repatha_patents_combined select patent_num_orig from temp_repatha_patents_g1;
+
+\echo retrieve wosids for patents (contains elegant Shixin construct)***
+drop table if exists temp_repatha_patents_wos;
+create table temp_repatha_patents_wos as 
+select * from wos_patent_mapping where patent_orig in (select 
+distinct lpad(drug_patents,8,'0') from temp_repatha_patents_combined 
+where length(drug_patents) = 7);
+
+\echo joining on wos_pmid_mapping to get pmids **
+drop table if exists temp_repatha_patents_pmid;
+create table temp_repatha_patents_pmid as
+select a.patent_num,a.wos_id,b.pmid_int from temp_repatha_patents_wos a 
+LEFT JOIN wos_pmid_mapping b on a.wos_id=b.wos_uid;
+
+\echo mapping pmids to grants via SPIRES***
+drop table if exists temp_repatha_patents_spires;
+create table temp_repatha_patents_spires as select a.patent_num,a.pmid_int,b.full_project_num_dc,b.admin_phs_org_code,b.match_case,
+b.external_org_id,b.index_name from temp_repatha_patents_pmid a
+LEFT JOIN spires_pub_projects b on a.pmid_int=b.pmid;
+
+--LITERATURE BRANCH
+-- begin with drug or biologic name, e.g. repatha aka evolocumab aka AMG145
 -- assemble seedset of pmids by scraping from FDA approval documents and identifying corresponding pmids
+-- use R script is seedset.R to get back structured data from eutuils, the source file is ev_fda_foundational, the output is ev_fda_seedset
+
 -- load seedset of 59 pmids from R environment exported as repatha_seedset.csv
--- the R script is seedset.R, the source file is ev_fda_foundational, the output is ev_fda_seedset
 
 \echo loading seedset pmids ***
 drop table if exists temp_repatha1;
 create table temp_repatha1 (sno int, uid int, pubdate varchar, lastauthor varchar, source varchar, title varchar, year int);
 copy temp_repatha1 from '/tmp/repatha_seedset.csv' DELIMITER ',' CSV HEADER;
 
-\echo search for repatha in CT tables and identify pmids from cited references in ct_references***
+-- create CT to pmid table (temp_repatha_ct)
+\echo search for repatha in CT tables in PARDI and identify pmids from cited references in ct_references***
 drop table if exists temp_repatha_ct;
 create table temp_repatha_ct as select nct_id,pmid from ct_references where nct_id in (select nct_id from ct_interventions 
 where lower(intervention_name) ='evolocumab' or lower(intervention_name) like 'repatha');
 
-\echo combine distinct pmids from temp_repatah_ct and temp_repatha1***
+--create pmid_gen1a (temp_repatha_pmid_concat) which combines pmids 
+--from temp_repatha_ct and temp_repatha1
+\echo combine distinct pmids from temp_repatha_ct and temp_repatha1***
 drop table if exists temp_repatha_pmid_concat;
 create table temp_repatha_pmid_concat (pmid int);
 insert into temp_repatha_pmid_concat select uid from temp_repatha1;
 insert into temp_repatha_pmid_concat select pmid from temp_repatha_ct where pmid not in (select uid from temp_repatha1);
 
+--create table of Institution and Grant Mappings to pmid_gen1a
 \echo primary matches against SPIRES***
 drop table if exists temp_repatha_primary;
 create table temp_repatha_primary as select a.pmid as pmid ,b.full_project_num_dc,b.admin_phs_org_code,b.match_case,b.external_org_id,b.index_name 
@@ -29,7 +85,8 @@ from temp_repatha_pmid_concat a LEFT JOIN spires_pub_projects b on a.pmid=b.pmid
 -- join pmids on wos_mapping to get wos_uid aka source_id
 \echo getting corresponding wos_uids aka source_ids***
 drop table if exists temp_repatha2;
-create table temp_repatha2 as select a.pmid as seedct_pmid ,b.pmid_int,b.pmid,b.wos_uid from temp_repatha_pmid_concat a LEFT JOIN wos_pmid_mapping b ON a.pmid=b.pmid_int;
+create table temp_repatha2 as select a.pmid as seedct_pmid ,b.pmid_int,b.pmid,b.wos_uid from temp_repatha_pmid_concat a LEFT JOIN wos_pmid_mapping b 
+ON a.pmid=b.pmid_int;
 
 
 --- in this case wos_uids were not returned for 6 pmids so the table was manually edited to include them based on a GUI search
@@ -48,19 +105,7 @@ drop table if exists temp_repatha3;
 create table temp_repatha3 as select a.pmid_int,a.wos_uid,b.cited_source_uid from temp_repatha2 a LEFT JOIN wos_references b on a.wos_uid=b.source_id;
 copy (select * from temp_repatha3) to '/tmp/tr3.csv' DELIMITER ',' CSV HEADER;
 
--- in R 
--- cleanup cited source_uids in R using George's WosClean.R script, tr3.csv as input and tr4.csv as output
--- copy tr4 into temp_repatha4
-
---tr3 <- read.csv("~/Desktop/tr3.csv",header=T,stringsAsFactors=FALSE)
---library(dplyr)
---tr4 <- tr3 %>% rowwise() %>% mutate(Clean= WosClean(cited_source_uid)) %>% data.frame()
---write.csv(tr4,file=("~/Desktop/tr4.csv"))
-
--- copy tr4 back into server at /tmp and edt header in emacs to get serial_no (sno) columnheader;
-
 -- Clean WOS IDs.
-
 \echo Cleaning WOS IDs on temp_repatha3...***
 update temp_repatha3
   set cited_source_uid =
@@ -96,44 +141,6 @@ create table temp_repatha_secondary as select a.*,b.full_project_num_dc,b.admin_
 from temp_repatha4 a 
 LEFT JOIN spires_pub_projects b on a.pmid_output=b.pmid;
 
-\echo taking on patents now***
-
--- First find relevant patent numbers by the method of Google
--- then search for these number in uspto_patents
--- select patent_num from uspto_patents where patent_num like '%8871913' or patent_num like '%8871914';
--- returns 
--- patent_num
--- ------------
---  08871913
---  08871914
-
--- search aaain with correct numbers
-
---drop table if exists temp_repatha_patent_citations;
---create table temp_repatha_patent_citations as select *  from uspto_pat_citations where patent_num in ('08871913', '08871914');
-
-\echo geting list of wos_ids cited by Repatha patents***
-drop table if exists temp_repatha_patent_wos;
-create table temp_repatha_patent_wos as select * from wos_patent_mapping where patent_num in ('US8871913','US8871914');
-
-\echo converting wos_ids to pmids***
-drop table if exists temp_repatha_patent_pmid;
-create table temp_repatha_patent_pmid as select wos_uid,pmid_int from wos_pmid_mapping 
-where wos_uid in (select distinct wos_id from temp_repatha_patent_wos);
-
-\echo mapping pmids to grants via SPIRES***
-drop table if exists temp_repatha_patent_spires;
-create table temp_repatha_patent_spires as select a.*,b.* from temp_repatha_patent_pmid a 
-LEFT JOIN spires_pub_projects b on a.pmid_int=b.pmid;
-
-\echo getting patents cited by Repatha patents (G2) and mapping to wos_ids***
-drop table if exists temp_repatha_patents_G2_wos;
-create table temp_repatha_patents_G2_wos as select wos_id from wos_patent_mapping where patent_orig in (select cited_patent_orig from temp_repatha_patents_G2);
-
-\echo mapping G2 wos_ids to pmids and then to SPIRES***
-drop table if exists temp_repatha_patents_G2_spires;
-create table temp_repatha_patents_G2_spires as select full_project_num_dc,pmid,admin_phs_org_code,match_case,external_org_id,index_name from spires_pub_projects where pmid in ((select pmid_int from wos_pmid_mapping where wos_uid in (select distinct wos_id from temp_repatha_patents_G2_wos)));;
-
 \echo export all relevant tables to /tmp***
 copy(select * from temp_repatha_ct) to '/tmp/temp_repatha_ct.csv' DELIMITER ',' CSV HEADER;
 copy(select * from temp_repatha_primary) to '/tmp/temp_repatha_primary.csv' DELIMITER ',' CSV HEADER;
@@ -141,7 +148,3 @@ copy(select * from temp_repatha_secondary) to '/tmp/temp_repatha_secondary.csv' 
 copy(select * from temp_repatha_patent_spires) to '/tmp/temp_repatha_patent_spires.csv' DELIMITER ',' CSV HEADER;
 copy(select * from temp_repatha_patents_G2_wos) to '/tmp/temp_repatha_patents_G2_wos.csv' DELIMITER ',' CSV HEADER;
 copy(select * from temp_repatha_patents_G2_spires) to '/tmp/temp_repatha_patents_G2-spires.csv' DELIMITER ',' CSV HEADER;
-
-
-
-
