@@ -98,7 +98,7 @@ LEFT JOIN spires_pub_projects b on a.pmid_output=b.pmid;
 
 \echo taking on patents now***
 
--- First find relevant patnet numbers by the method of Google
+-- First find relevant patent numbers by the method of Google
 -- then search for these number in uspto_patents
 -- select patent_num from uspto_patents where patent_num like '%8871913' or patent_num like '%8871914';
 -- returns 
@@ -111,20 +111,36 @@ LEFT JOIN spires_pub_projects b on a.pmid_output=b.pmid;
 
 --drop table if exists temp_repatha_patent_citations;
 --create table temp_repatha_patent_citations as select *  from uspto_pat_citations where patent_num in ('08871913', '08871914');
+
+\echo geting list of wos_ids cited by Repatha patents***
 drop table if exists temp_repatha_patent_wos;
 create table temp_repatha_patent_wos as select * from wos_patent_mapping where patent_num in ('US8871913','US8871914');
+
+\echo converting wos_ids to pmids***
 drop table if exists temp_repatha_patent_pmid;
 create table temp_repatha_patent_pmid as select wos_uid,pmid_int from wos_pmid_mapping 
 where wos_uid in (select distinct wos_id from temp_repatha_patent_wos);
+
+\echo mapping pmids to grants via SPIRES***
 drop table if exists temp_repatha_patent_spires;
 create table temp_repatha_patent_spires as select a.*,b.* from temp_repatha_patent_pmid a 
 LEFT JOIN spires_pub_projects b on a.pmid_int=b.pmid;
 
-\echo export all relevant tables***
+\echo getting patents cited by Repatha patents (G2) and mapping to wos_ids***
+drop table if exists temp_repatha_patents_G2_wos;
+create table temp_repatha_patents_G2_wos as select wos_id from wos_patent_mapping where patent_orig in (select cited_patent_orig from temp_repatha_patents_G2);
+
+\echo mapping G2 wos_ids to pmids and then to SPIRES***
+drop table if exists temp_repatha_patents_G2_spires;
+create table temp_repatha_patents_G2_spires as select full_project_num_dc,pmid,admin_phs_org_code,match_case,external_org_id,index_name from spires_pub_projects where pmid in ((select pmid_int from wos_pmid_mapping where wos_uid in (select distinct wos_id from temp_repatha_patents_G2_wos)));;
+
+\echo export all relevant tables to /tmp***
 copy(select * from temp_repatha_ct) to '/tmp/temp_repatha_ct.csv' DELIMITER ',' CSV HEADER;
 copy(select * from temp_repatha_primary) to '/tmp/temp_repatha_primary.csv' DELIMITER ',' CSV HEADER;
 copy(select * from temp_repatha_secondary) to '/tmp/temp_repatha_secondary.csv' DELIMITER ',' CSV HEADER;
 copy(select * from temp_repatha_patent_spires) to '/tmp/temp_repatha_patent_spires.csv' DELIMITER ',' CSV HEADER;
+copy(select * from temp_repatha_patents_G2_wos) to '/tmp/temp_repatha_patents_G2_wos.csv' DELIMITER ',' CSV HEADER;
+copy(select * from temp_repatha_patents_G2_spires) to '/tmp/temp_repatha_patents_G2-spires.csv' DELIMITER ',' CSV HEADER;
 
 
 
