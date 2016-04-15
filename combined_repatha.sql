@@ -11,6 +11,7 @@
 --  08871913
 --  08871914
 -- search aaain with correct numbers for cited patents and cited literature
+-- run this script as 'psql -d pardi < combined_repatha.sql > repathalog;'
 
 \echo create patents awarded to drug***
 drop table if exists temp_repatha_patents_g1;
@@ -29,7 +30,7 @@ in (select patent_num_orig from temp_repatha_patents_g1);
 \echo combining into single list of patent_numbers aka drug_patents***
 drop table if exists temp_repatha_patents_combined;
 create table temp_repatha_patents_combined as select cited_patent_orig as drug_patents from temp_repatha_patents_g2;
-insert into temp_repatha_patents_combined select patent_num_orig from temp_repatha_patents_g1;
+insert into temp_repatha_patents_combined select substring(patent_num_orig,2) from temp_repatha_patents_g1;
 
 \echo retrieve wosids for patents (contains elegant Shixin construct)***
 drop table if exists temp_repatha_patents_wos;
