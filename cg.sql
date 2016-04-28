@@ -1,6 +1,8 @@
 -- CLinical Guidelines Mapping
-
 --map clinical guidelines from current inventory that have pnids to wos_uids
+-- this script shoudl be run after Lindsay's update script.
+
+-- Left join cg_uid_pmid_mapping to wos_pmid_mapping to get wos_uids (aks source_id and WoSIDs)
 drop table if exists temp_cg_pmid_wos;
 create table temp_cg_pmid_wos as select a.*,b.wos_uid from cg_uid_pmid_mapping a LEFT JOIN wos_pmid_mapping b on a.pmid::int=b.pmid_int;
 
@@ -12,7 +14,7 @@ drop table if exists temp_cg_pmid_wos_citedwos;
 create table temp_cg_pmid_wos_citedwos as select a.*,b.cited_source_uid  from temp_cg_pmid_wos a LEFT JOIN wos_references b 
 on a.wos_uid=b.source_id;
 
---clean up cited_source_uids 
+--clean up cited_source_uids by fixing strings and pre-pending WOS where necessary
 update temp_cg_pmid_wos_citedwos       
   set cited_source_uid =
   (
@@ -24,8 +26,7 @@ update temp_cg_pmid_wos_citedwos
            then cited_source_uid
          else substring('WOS:'||cited_source_uid, 1, 19)
     end
-  )
-;
+  );
 
 --map cited_source_uids to pmids
 drop table if exists temp_cg_pmid_wos_citedwos_pmid;
