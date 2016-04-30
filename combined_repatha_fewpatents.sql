@@ -16,14 +16,14 @@
 
 \echo create patents awarded to drug***
 drop table if exists fp_temp_repatha_patents_g1;
-create table temp_repatha_patents_g1 (drug varchar, patent_num_orig varchar);
+create table fp_temp_repatha_patents_g1 (drug varchar, patent_num_orig varchar);
 insert into fp_temp_repatha_patents_g1 values ('Repatha','08871913');
 insert into fp_temp_repatha_patents_g1 values ('Repatha','08871914');
 
 \echo retrieve wosids for patents***
 drop table if exists fp_temp_repatha_patents_wos;
 create table fp_temp_repatha_patents_wos as select * from wos_patent_mapping 
-where patent_orig in (select patent_num_orig from temp_repatha_patents_g1);
+where patent_orig in (select patent_num_orig from fp_temp_repatha_patents_g1);
 
 \echo joining on wos_pmid_mapping to get pmids **
 drop table if exists fp_temp_repatha_patents_pmid;
@@ -118,8 +118,9 @@ b.external_org_id,b.index_name from fp_temp_repatha4 a
 LEFT JOIN spires_pub_projects b on a.pmid_output=b.pmid;
 
 \echo export all relevant tables to /tmp***
-copy(select * from fp_temp_repatha_patents_pmid) to '/tmp/temp_repatha_patents_pmid.csv' DELIMITER ',' CSV HEADER;
-copy(select * from fp_temp_repatha_citg1_spires) to '/tmp/temp_repatha_citg1_spires.csv' DELIMITER ',' CSV HEADER;
-copy(select * from fp_temp_repatha_citg2_spires) to '/tmp/temp_repatha_citg2_spires.csv' DELIMITER ',' CSV HEADER;
+copy(select * from fp_temp_repatha_patents_pmid) to '/tmp/fp_temp_repatha_patents_pmid.csv' DELIMITER ',' CSV HEADER;
+copy(select * from fp_temp_repatha_citg1_spires) to '/tmp/fp_temp_repatha_citg1_spires.csv' DELIMITER ',' CSV HEADER;
+copy(select * from fp_temp_repatha_citg2_spires) to '/tmp/fp_temp_repatha_citg2_spires.csv' DELIMITER ',' CSV HEADER;
+
 
 
