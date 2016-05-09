@@ -55,7 +55,8 @@ LEFT JOIN wos_pmid_mapping b on a.wos_id=b.wos_uid;
 \echo loading seedset pmids ***
 drop table if exists temp_repatha1;
 create table temp_repatha1 (sno int, uid int, pubdate varchar, lastauthor varchar, source varchar, title varchar, year int);
-copy temp_repatha1 from '/tmp/repatha_seedset.csv' DELIMITER ',' CSV HEADER;
+copy temp_repatha1 from '/tmp/seedset.csv' DELIMITER ',' CSV HEADER;
+
 
 -- create CT to pmid table (temp_repatha_ct)
 \echo search for repatha in CT tables in PARDI and identify pmids from cited references in ct_references***
