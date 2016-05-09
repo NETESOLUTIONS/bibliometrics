@@ -1,0 +1,1009 @@
+# and transform into an edge list and a node list#
+#
+temp_repatha_ct <- read.csv("~/Desktop/temp_repatha_ct.csv",stringsAsFactors=FALSE)#
+temp_repatha_primary <- read.csv("~/Desktop/temp_repatha_primary.csv",stringsAsFactors=FALSE)#
+temp_repatha_secondary <- read.csv("~/Desktop/temp_repatha_secondary.csv",stringsAsFactors=FALSE)#
+#
+#- Create node list#
+library(dplyr)#
+n1 <- c("Repatha","drug")#
+n2 <- temp_repatha_ct %>% select(nct_id) %>% mutate(ntype="CT")#
+n2 <- rbind(n1,n2)#
+colnames(n2) <- c("nodeID","ntype")#
+n3 <- temp_repatha_primary %>% select(pmid) %>% mutate(ntype="G1")#
+colnames(n3) <- c("nodeID","ntype")#
+n4 <- temp_repatha_secondary %>% select (pmid_output) %>% mutate(ntype="G2")#
+colnames(n4) <- c("nodeID","ntype")#
+n5 <- temp_repatha_primary %>% select(full_project_num_dc) %>% filter(full_project_num_dc!="") %>% mutate(ntype="grant")#
+colnames(n5) <- c("nodeID","ntype")#
+n6 <- temp_repatha_secondary %>% select(full_project_num_dc) %>% filter(full_project_num_dc!="") %>% mutate(ntype="grant")#
+colnames(n6) <- c("nodeID","ntype")#
+nodelist <- rbind(n2,n3,n4,n5,n6)#
+nodelist <- nodelist %>% unique()#
+#
+nodelist <- rbind(n2,n3,n4)#
+# suppress duplicates#
+nodelist <- nodelist %>% unique()#
+#
+# create edgelist#
+#master edges- drug to CT#
+e1 <- temp_repatha_ct %>% mutate(source="Repatha") %>% select(source,nct_id)#
+colnames(e1) <- c("source","target")#
+#CT to pmid#
+e2 <- temp_repatha_ct %>% select(nct_id,pmid)#
+colnames(e2) <- c("source","target")#
+# primary pmids to grants#
+e3 <- temp_repatha_primary %>% select (pmid,full_project_num_dc) %>% filter(full_project_num_dc!="")#
+colnames(e3) <- c("source","target")#
+# primary pmids to secondary pmids#
+e4 <- temp_repatha_secondary %>% select(input_pmid,pmid_output) %>% unique() #
+colnames(e4) <- c("source","target")#
+# secondary pmids to grants#
+e5 <- temp_repatha_secondary %>% select(pmid_output,full_project_num_dc) %>% filter(full_project_num_dc!="") %>% unique()#
+colnames(e5) <- c("source","target")#
+edgelist <- rbind(e1,e2,e3,e4,e5)#
+#
+# Export#
+write.csv(nodelist,file="~/Desktop/nodelist.csv")#
+write.csv(edgelist,file="~/Desktop/edgelist.csv")#
+save(nodelist,edgelist,file="~/Desktop/NodeEdge.RData")
+nodelist
+library(dplyr)
+nodelist %>% filter(ntype="grant")
+nodelist %>% filter(ntype=="grant")
+n6
+# read in output from repatha2.sql on dev2 (three csv files)#
+# and transform into an edge list and a node list#
+#
+temp_repatha_ct <- read.csv("~/Desktop/temp_repatha_ct.csv",stringsAsFactors=FALSE)#
+temp_repatha_primary <- read.csv("~/Desktop/temp_repatha_primary.csv",stringsAsFactors=FALSE)#
+temp_repatha_secondary <- read.csv("~/Desktop/temp_repatha_secondary.csv",stringsAsFactors=FALSE)#
+#
+#- Create node list#
+library(dplyr)#
+n1 <- c("Repatha","drug")#
+n2 <- temp_repatha_ct %>% select(nct_id) %>% mutate(ntype="CT")#
+n2 <- rbind(n1,n2)#
+colnames(n2) <- c("nodeID","ntype")#
+n3 <- temp_repatha_primary %>% select(pmid) %>% mutate(ntype="G1")#
+colnames(n3) <- c("nodeID","ntype")#
+n4 <- temp_repatha_secondary %>% select (pmid_output) %>% mutate(ntype="G2")#
+colnames(n4) <- c("nodeID","ntype")#
+n5 <- temp_repatha_primary %>% select(full_project_num_dc) %>% filter(full_project_num_dc!="") %>% mutate(ntype="grant")#
+colnames(n5) <- c("nodeID","ntype")#
+n6 <- temp_repatha_secondary %>% select(full_project_num_dc) %>% filter(full_project_num_dc!="") %>% mutate(ntype="grant")#
+colnames(n6) <- c("nodeID","ntype")#
+nodelist <- rbind(n2,n3,n4,n5,n6)#
+nodelist <- nodelist %>% unique()#
+#
+nodelist <- rbind(n2,n3,n4)#
+# suppress duplicates#
+nodelist <- nodelist %>% unique()#
+#
+# create edgelist#
+#master edges- drug to CT#
+e1 <- temp_repatha_ct %>% mutate(source="Repatha") %>% select(source,nct_id)#
+colnames(e1) <- c("source","target")#
+#CT to pmid#
+e2 <- temp_repatha_ct %>% select(nct_id,pmid)#
+colnames(e2) <- c("source","target")#
+# primary pmids to grants#
+e3 <- temp_repatha_primary %>% select (pmid,full_project_num_dc) %>% filter(full_project_num_dc!="")#
+colnames(e3) <- c("source","target")#
+# primary pmids to secondary pmids#
+e4 <- temp_repatha_secondary %>% select(input_pmid,pmid_output) %>% unique() #
+colnames(e4) <- c("source","target")#
+# secondary pmids to grants#
+e5 <- temp_repatha_secondary %>% select(pmid_output,full_project_num_dc) %>% filter(full_project_num_dc!="") %>% unique()#
+colnames(e5) <- c("source","target")#
+edgelist <- rbind(e1,e2,e3,e4,e5)#
+#
+# Export#
+write.csv(nodelist,file="~/Desktop/nodelist.csv")#
+write.csv(edgelist,file="~/Desktop/edgelist.csv")#
+save(nodelist,edgelist,file="~/Desktop/NodeEdge.RData")
+n6
+nodelist %>% filter(ntype=="grant")
+n6 %>% filter(ntype=="grant")
+rbind(n2,n3,n4,n5,n6)
+nodelist <- rbind(n2,n3,n4,n5,n6)
+nodelist
+n6 <- temp_repatha_secondary %>% select(full_project_num_dc) %>% filter(full_project_num_dc!="") %>% mutate(ntype="grant")
+n6
+# read in output from repatha2.sql on dev2 (three csv files)#
+# and transform into an edge list and a node list#
+#
+temp_repatha_ct <- read.csv("~/Desktop/temp_repatha_ct.csv",stringsAsFactors=FALSE)#
+temp_repatha_primary <- read.csv("~/Desktop/temp_repatha_primary.csv",stringsAsFactors=FALSE)#
+temp_repatha_secondary <- read.csv("~/Desktop/temp_repatha_secondary.csv",stringsAsFactors=FALSE)#
+#
+#- Create node list#
+library(dplyr)#
+n1 <- c("Repatha","drug")#
+n2 <- temp_repatha_ct %>% select(nct_id) %>% mutate(ntype="CT")#
+n2 <- rbind(n1,n2)#
+colnames(n2) <- c("nodeID","ntype")#
+n3 <- temp_repatha_primary %>% select(pmid) %>% mutate(ntype="G1")#
+colnames(n3) <- c("nodeID","ntype")#
+n4 <- temp_repatha_secondary %>% select (pmid_output) %>% mutate(ntype="G2")#
+colnames(n4) <- c("nodeID","ntype")#
+n5 <- temp_repatha_primary %>% select(full_project_num_dc) %>% filter(full_project_num_dc!="") %>% mutate(ntype="grant")#
+colnames(n5) <- c("nodeID","ntype")#
+n6 <- temp_repatha_secondary %>% select(full_project_num_dc) %>% filter(full_project_num_dc!="") %>% mutate(ntype="grant")#
+colnames(n6) <- c("nodeID","ntype")#
+nodelist <- rbind(n2,n3,n4,n5,n6)#
+nodelist <- nodelist %>% unique()#
+#
+nodelist <- rbind(n2,n3,n4)#
+# suppress duplicates#
+nodelist <- nodelist %>% unique()#
+#
+# create edgelist#
+#master edges- drug to CT#
+e1 <- temp_repatha_ct %>% mutate(source="Repatha") %>% select(source,nct_id)#
+colnames(e1) <- c("source","target")#
+#CT to pmid#
+e2 <- temp_repatha_ct %>% select(nct_id,pmid)#
+colnames(e2) <- c("source","target")#
+# primary pmids to grants#
+e3 <- temp_repatha_primary %>% select (pmid,full_project_num_dc) %>% filter(full_project_num_dc!="")#
+colnames(e3) <- c("source","target")#
+# primary pmids to secondary pmids#
+e4 <- temp_repatha_secondary %>% select(input_pmid,pmid_output) %>% unique() #
+colnames(e4) <- c("source","target")#
+# secondary pmids to grants#
+e5 <- temp_repatha_secondary %>% select(pmid_output,full_project_num_dc) %>% filter(full_project_num_dc!="") %>% unique()#
+colnames(e5) <- c("source","target")#
+edgelist <- rbind(e1,e2,e3,e4,e5)#
+#
+# Export#
+write.csv(nodelist,file="~/Desktop/nodelist.csv")#
+write.csv(edgelist,file="~/Desktop/edgelist.csv")#
+save(nodelist,edgelist,file="~/Desktop/NodeEdge.RData")
+nodelist
+n6
+n5
+n4
+nodelist <- rbind(n2,n3,n4,n5,n6)
+nodelist
+nodelist <- nodelist %>% unique()
+nodelist
+rm(list=ls())
+ls()
+q()
+source("~/bibliometrics/NodeEdgeList.R")
+ls()
+nodelist
+ls()
+n6
+man(rbind)
+help(rbind)
+ls9)
+ls()
+nodelist
+nodelist %>%
+filter(ntype=="grant")
+nodelist %>% filter(ntype=="grant")
+n6 %>% filter(ntype=="grant")
+rbind(n2,n3,n4,n5,n6)
+nodelist <- rbind(n2,n3,n4,n5,n6)
+nodelist
+# read in output from repatha2.sql on dev2 (three csv files)#
+# and transform into an edge list and a node list#
+#
+temp_repatha_ct <- read.csv("~/Desktop/temp_repatha_ct.csv",stringsAsFactors=FALSE)#
+temp_repatha_primary <- read.csv("~/Desktop/temp_repatha_primary.csv",stringsAsFactors=FALSE)#
+temp_repatha_secondary <- read.csv("~/Desktop/temp_repatha_secondary.csv",stringsAsFactors=FALSE)#
+#
+#- Create node list#
+library(dplyr)#
+n1 <- c("Repatha","drug")#
+n2 <- temp_repatha_ct %>% select(nct_id) %>% mutate(ntype="CT")#
+n2 <- rbind(n1,n2)#
+colnames(n2) <- c("nodeID","ntype")#
+n3 <- temp_repatha_primary %>% select(pmid) %>% mutate(ntype="G1")#
+colnames(n3) <- c("nodeID","ntype")#
+n4 <- temp_repatha_secondary %>% select (pmid_output) %>% mutate(ntype="G2")#
+colnames(n4) <- c("nodeID","ntype")#
+n5 <- temp_repatha_primary %>% select(full_project_num_dc) %>% filter(full_project_num_dc!="") %>% mutate(ntype="grant")#
+colnames(n5) <- c("nodeID","ntype")#
+n6 <- temp_repatha_secondary %>% select(full_project_num_dc) %>% filter(full_project_num_dc!="") %>% mutate(ntype="grant")#
+colnames(n6) <- c("nodeID","ntype")#
+nodelist <- rbind(n2,n3,n4,n5,n6)#
+nodelist <- nodelist %>% unique()#
+#
+# suppress duplicates#
+nodelist <- nodelist %>% unique()#
+#
+# create edgelist#
+#master edges- drug to CT#
+e1 <- temp_repatha_ct %>% mutate(source="Repatha") %>% select(source,nct_id)#
+colnames(e1) <- c("source","target")#
+#CT to pmid#
+e2 <- temp_repatha_ct %>% select(nct_id,pmid)#
+colnames(e2) <- c("source","target")#
+# primary pmids to grants#
+e3 <- temp_repatha_primary %>% select (pmid,full_project_num_dc) %>% filter(full_project_num_dc!="")#
+colnames(e3) <- c("source","target")#
+# primary pmids to secondary pmids#
+e4 <- temp_repatha_secondary %>% select(input_pmid,pmid_output) %>% unique() #
+colnames(e4) <- c("source","target")#
+# secondary pmids to grants#
+e5 <- temp_repatha_secondary %>% select(pmid_output,full_project_num_dc) %>% filter(full_project_num_dc!="") %>% unique()#
+colnames(e5) <- c("source","target")#
+edgelist <- rbind(e1,e2,e3,e4,e5)#
+#
+# Export#
+write.csv(nodelist,file="~/Desktop/nodelist.csv")#
+write.csv(edgelist,file="~/Desktop/edgelist.csv")#
+save(nodelist,edgelist,file="~/Desktop/NodeEdge.RData")
+temp_repatha_primary
+str(temp_repatha_primary )
+temp_repatha_primary %>% select(pmid,external_org_id)
+temp_repatha_primary %>% select(pmid,external_org_id) %>% filter(!is.na(external_org_id))
+temp_repatha_primary %>% select(pmid,external_org_id) %>% filter(!is.na(external_org_id)) %>% unique()
+temp_repatha_secondary %>% select(pmid,external_org_id) %>% filter(!is.na(external_org_id)) %>% unique()
+temp_repatha_secondary %>% select(pmid_output,external_org_id) %>% filter(!is.na(external_org_id)) %>% unique()
+e7 <- temp_repatha_secondary %>% select(pmid_output,external_org_id) %>% filter(!is.na(external_org_id)) %>% unique()
+temp_repatha_secondary %>% select(pmid,external_org_id) %>% filter(!is.na(external_org_id)) %>% unique()
+temp_repatha_secondary %>% select(pmid,paste(external_org_id)) %>% filter(!is.na(external_org_id)) %>% unique()
+temp_repatha_secondary %>% select(pmid,external_org_id) %>% filter(!is.na(external_org_id)) %>% unique() %>% mutate(pEOI=paste("i",external_org_id))
+temp_repatha_secondary %>% select(pmid,external_org_id) %>% filter(!is.na(external_org_id)) %>% unique() %>% mutate(pEOI=paste("i",external_org_id,sep=""))
+temp_repatha_secondary %>% select(pmid_output,external_org_id) %>% filter(!is.na(external_org_id)) %>% unique() %>% mutate(pEOI=paste("i",external_org_id,sep=""))
+temp_repatha_secondary %>% select(pmid_output,external_org_id) %>% filter(!is.na(external_org_id)) %>% unique() %>% mutate(pEOI=paste("i",external_org_id,sep="")) %>% select(pmid_output,pEOI)
+temp_repatha_primary %>% select(pmid,external_org_id) %>% filter(!is.na(external_org_id)) %>% unique() %>% mutate(pEOI=paste("i",external_org_id,sep=""))
+temp_repatha_primary %>% select(pmid,external_org_id) %>% filter(!is.na(external_org_id)) %>% unique() %>% mutate(pEOI=paste("i",external_org_id,sep="")) %>% select(pmid,pEOI)
+e8 <- temp_repatha_primary %>% select(pmid,external_org_id) %>% filter(!is.na(external_org_id)) %>% unique() %>% mutate(pEOI=paste("i",external_org_id,sep="")) %>% select(pmid,pEOI)
+e7
+\\
+e7 <- temp_repatha_secondary %>% select(pmid_output,external_org_id) %>% filter(!is.na(external_org_id)) %>% unique() %>% mutate(pEOI=paste("i",external_org_id,sep="")) %>% select(pmid_output,pEOI)
+e7
+e7 %>% nrow()
+e7 %>% unique() %>% nrow()
+rbind(e7,e8)
+# read in output from repatha2.sql on dev2 (three csv files)#
+# and transform into an edge list and a node list#
+#
+temp_repatha_ct <- read.csv("~/Desktop/temp_repatha_ct.csv",stringsAsFactors=FALSE)#
+temp_repatha_primary <- read.csv("~/Desktop/temp_repatha_primary.csv",stringsAsFactors=FALSE)#
+temp_repatha_secondary <- read.csv("~/Desktop/temp_repatha_secondary.csv",stringsAsFactors=FALSE)#
+#
+#- Create node list#
+library(dplyr)#
+n1 <- c("Repatha","drug")#
+n2 <- temp_repatha_ct %>% select(nct_id) %>% mutate(ntype="CT")#
+n2 <- rbind(n1,n2)#
+colnames(n2) <- c("nodeID","ntype")#
+n3 <- temp_repatha_primary %>% select(pmid) %>% mutate(ntype="G1")#
+colnames(n3) <- c("nodeID","ntype")#
+n4 <- temp_repatha_secondary %>% select (pmid_output) %>% mutate(ntype="G2")#
+colnames(n4) <- c("nodeID","ntype")#
+n5 <- temp_repatha_primary %>% select(full_project_num_dc) %>% filter(full_project_num_dc!="") %>% mutate(ntype="grant")#
+colnames(n5) <- c("nodeID","ntype")#
+n6 <- temp_repatha_secondary %>% select(full_project_num_dc) %>% filter(full_project_num_dc!="") %>% mutate(ntype="grant")#
+colnames(n6) <- c("nodeID","ntype")#
+nodelist <- rbind(n2,n3,n4,n5,n6)#
+nodelist <- nodelist %>% unique()#
+#
+# suppress duplicates#
+nodelist <- nodelist %>% unique()#
+#
+# create edgelist#
+#master edges- drug to CT#
+e1 <- temp_repatha_ct %>% mutate(source="Repatha") %>% select(source,nct_id)#
+colnames(e1) <- c("source","target")#
+#CT to pmid#
+e2 <- temp_repatha_ct %>% select(nct_id,pmid)#
+colnames(e2) <- c("source","target")#
+# primary pmids to grants#
+e3 <- temp_repatha_primary %>% select (pmid,full_project_num_dc) %>% filter(full_project_num_dc!="")#
+colnames(e3) <- c("source","target")#
+# primary pmids to secondary pmids#
+e4 <- temp_repatha_secondary %>% select(input_pmid,pmid_output) %>% unique() #
+colnames(e4) <- c("source","target")#
+# secondary pmids to grants#
+e5 <- temp_repatha_secondary %>% select(pmid_output,full_project_num_dc) %>% filter(full_project_num_dc!="") %>% unique()#
+colnames(e5) <- c("source","target")#
+e6 <- temp_repatha_primary %>% select(pmid,external_org_id) %>% filter(!is.na(external_org_id)) %>% unique()#
+colnames(e6) <- c("source","target")#
+e7 <- temp_repatha_secondary %>% select(pmid_output,external_org_id) %>% filter(!is.na(external_org_id)) %>% unique() %>% mutate(pEOI=paste("i",external_org_id,sep="")) %>% select(pmid_output,pEOI)#
+colnames(e7) <- c("source","target")#
+e8 <- temp_repatha_primary %>% select(pmid,external_org_id) %>% filter(!is.na(external_org_id)) %>% unique() %>% mutate(pEOI=paste("i",external_org_id,sep="")) %>% select(pmid,pEOI)#
+colnames(e8) <- c("source","target")#
+edgelist <- rbind(e1,e2,e3,e4,e5,e6,e7,e8)#
+#
+# Export#
+write.csv(nodelist,file="~/Desktop/nodelist.csv")#
+write.csv(edgelist,file="~/Desktop/edgelist.csv")#
+save(nodelist,edgelist,file="~/Desktop/NodeEdge.RData")
+rbind(e7,e8)
+rbind(e7,e8) %>%
+select(pEOI)
+n7 <- rbind(e7,e8)
+n7
+n7 %>% select(target)
+n7 %>% select(target) %>% mutate(ntype="inst")
+n7 %>% select(target) %>% mutate(ntype="inst") %>% nrow()
+n7 %>% select(target) %>% mutate(ntype="inst") %>% unqiue() %>% nrow()
+n7 %>% select(target) %>% mutate(ntype="inst") %>% unique() %>% nrow()
+# read in output from repatha2.sql on dev2 (three csv files)#
+# and transform into an edge list and a node list#
+#
+temp_repatha_ct <- read.csv("~/Desktop/temp_repatha_ct.csv",stringsAsFactors=FALSE)#
+temp_repatha_primary <- read.csv("~/Desktop/temp_repatha_primary.csv",stringsAsFactors=FALSE)#
+temp_repatha_secondary <- read.csv("~/Desktop/temp_repatha_secondary.csv",stringsAsFactors=FALSE)#
+#
+#- Create node list#
+library(dplyr)#
+n1 <- c("Repatha","drug")#
+n2 <- temp_repatha_ct %>% select(nct_id) %>% mutate(ntype="CT")#
+n2 <- rbind(n1,n2)#
+colnames(n2) <- c("nodeID","ntype")#
+n3 <- temp_repatha_primary %>% select(pmid) %>% mutate(ntype="G1")#
+colnames(n3) <- c("nodeID","ntype")#
+n4 <- temp_repatha_secondary %>% select (pmid_output) %>% mutate(ntype="G2")#
+colnames(n4) <- c("nodeID","ntype")#
+n5 <- temp_repatha_primary %>% select(full_project_num_dc) %>% filter(full_project_num_dc!="") %>% mutate(ntype="grant")#
+colnames(n5) <- c("nodeID","ntype")#
+n6 <- temp_repatha_secondary %>% select(full_project_num_dc) %>% filter(full_project_num_dc!="") %>% mutate(ntype="grant")#
+colnames(n6) <- c("nodeID","ntype")#
+n7 <- rbind(e7,e8)#
+n7 %>% select(target) %>% mutate(ntype="inst") %>% unique() %>% nrow()#
+colnames(n7) <-c("nodeID","ntype")#
+nodelist <- rbind(n2,n3,n4,n5,n6,m7)#
+nodelist <- nodelist %>% unique()#
+#
+# suppress duplicates#
+nodelist <- nodelist %>% unique()#
+#
+# create edgelist#
+#master edges- drug to CT#
+e1 <- temp_repatha_ct %>% mutate(source="Repatha") %>% select(source,nct_id)#
+colnames(e1) <- c("source","target")#
+#CT to pmid#
+e2 <- temp_repatha_ct %>% select(nct_id,pmid)#
+colnames(e2) <- c("source","target")#
+# primary pmids to grants#
+e3 <- temp_repatha_primary %>% select (pmid,full_project_num_dc) %>% filter(full_project_num_dc!="")#
+colnames(e3) <- c("source","target")#
+# primary pmids to secondary pmids#
+e4 <- temp_repatha_secondary %>% select(input_pmid,pmid_output) %>% unique() #
+colnames(e4) <- c("source","target")#
+# secondary pmids to grants#
+e5 <- temp_repatha_secondary %>% select(pmid_output,full_project_num_dc) %>% filter(full_project_num_dc!="") %>% unique()#
+colnames(e5) <- c("source","target")#
+e6 <- temp_repatha_primary %>% select(pmid,external_org_id) %>% filter(!is.na(external_org_id)) %>% unique()#
+colnames(e6) <- c("source","target")#
+e7 <- temp_repatha_secondary %>% select(pmid_output,external_org_id) %>% filter(!is.na(external_org_id)) %>% unique() %>% mutate(pEOI=paste("i",external_org_id,sep="")) %>% select(pmid_output,pEOI)#
+colnames(e7) <- c("source","target")#
+e8 <- temp_repatha_primary %>% select(pmid,external_org_id) %>% filter(!is.na(external_org_id)) %>% unique() %>% mutate(pEOI=paste("i",external_org_id,sep="")) %>% select(pmid,pEOI)#
+colnames(e8) <- c("source","target")#
+edgelist <- rbind(e1,e2,e3,e4,e5,e6,e7,e8)#
+#
+# Export#
+write.csv(nodelist,file="~/Desktop/nodelist.csv")#
+write.csv(edgelist,file="~/Desktop/edgelist.csv")#
+save(nodelist,edgelist,file="~/Desktop/NodeEdge.RData")
+str(edgelist)
+str(nodelist)
+q()
+edgelist
+nrow(edgelist)
+nrow(complete.cases(edgelist))
+nrow(edgelist[complete.cases(edgelist)])
+nrow(edgelist[complete.cases(edgelist),])
+temp_repatha_ct
+temp_repatha_primary
+temp_repatha_ct %>% select(nct_id) %>% mutate(ntype="CT")
+library(dplyr)
+temp_repatha_ct %>% select(nct_id) %>% mutate(ntype="CT")
+n1 <- c("Repatha","drug")
+n2 <- rbind(n1,n2)
+n2
+n3 <- temp_repatha_primary %>% select(pmid) %>% mutate(ntype="G1")
+# read in output from repatha2.sql on dev2 (three csv files)#
+# and transform into an edge list and a node list#
+#
+temp_repatha_ct <- read.csv("~/Desktop/temp_repatha_ct.csv",stringsAsFactors=FALSE)#
+temp_repatha_primary <- read.csv("~/Desktop/temp_repatha_primary.csv",stringsAsFactors=FALSE)#
+temp_repatha_secondary <- read.csv("~/Desktop/temp_repatha_secondary.csv",stringsAsFactors=FALSE)#
+#
+#- Create node list#
+library(dplyr)#
+n1 <- c("Repatha","drug")#
+n2 <- temp_repatha_ct %>% select(nct_id) %>% mutate(ntype="CT")#
+n2 <- rbind(n1,n2)#
+colnames(n2) <- c("nodeID","ntype")#
+n3 <- temp_repatha_primary %>% select(pmid) %>% mutate(ntype="G1")#
+colnames(n3) <- c("nodeID","ntype")#
+n4 <- temp_repatha_secondary %>% select (pmid_output) %>% mutate(ntype="G2")#
+colnames(n4) <- c("nodeID","ntype")#
+n5 <- temp_repatha_primary %>% select(full_project_num_dc) %>% filter(full_project_num_dc!="") %>% mutate(ntype="grant")#
+colnames(n5) <- c("nodeID","ntype")#
+n6 <- temp_repatha_secondary %>% select(full_project_num_dc) %>% filter(full_project_num_dc!="") %>% mutate(ntype="grant")#
+colnames(n6) <- c("nodeID","ntype")#
+n7 <- rbind(e7,e8)#
+n7 %>% select(target) %>% mutate(ntype="inst") %>% unique() %>% nrow()#
+colnames(n7) <-c("nodeID","ntype")#
+nodelist <- rbind(n2,n3,n4,n5,n6,m7)#
+nodelist <- nodelist %>% unique()#
+#
+# suppress duplicates#
+nodelist <- nodelist %>% unique()#
+#
+# create edgelist#
+#master edges- drug to CT#
+e1 <- temp_repatha_ct %>% mutate(source="Repatha") %>% select(source,nct_id)#
+colnames(e1) <- c("source","target")#
+#CT to pmid#
+e2 <- temp_repatha_ct %>% select(nct_id,pmid)#
+colnames(e2) <- c("source","target")#
+# primary pmids to grants#
+e3 <- temp_repatha_primary %>% select (pmid,full_project_num_dc) %>% filter(full_project_num_dc!="")#
+colnames(e3) <- c("source","target")#
+# primary pmids to secondary pmids#
+e4 <- temp_repatha_secondary %>% select(input_pmid,pmid_output) %>% unique() #
+colnames(e4) <- c("source","target")#
+# secondary pmids to grants#
+e5 <- temp_repatha_secondary %>% select(pmid_output,full_project_num_dc) %>% filter(full_project_num_dc!="") %>% unique()#
+colnames(e5) <- c("source","target")#
+e6 <- temp_repatha_primary %>% select(pmid,external_org_id) %>% filter(!is.na(external_org_id)) %>% unique()#
+colnames(e6) <- c("source","target")#
+e7 <- temp_repatha_secondary %>% select(pmid_output,external_org_id) %>% filter(!is.na(external_org_id)) %>% unique() %>% mutate(pEOI=paste("i",external_org_id,sep="")) %>% select(pmid_output,pEOI)#
+colnames(e7) <- c("source","target")#
+e8 <- temp_repatha_primary %>% select(pmid,external_org_id) %>% filter(!is.na(external_org_id)) %>% unique() %>% mutate(pEOI=paste("i",external_org_id,sep="")) %>% select(pmid,pEOI)#
+colnames(e8) <- c("source","target")#
+edgelist <- rbind(e1,e2,e3,e4,e5,e6,e7,e8)#
+#
+# Export#
+write.csv(nodelist,file="~/Desktop/nodelist.csv")#
+write.csv(edgelist,file="~/Desktop/edgelist.csv")#
+save(nodelist,edgelist,file="~/Desktop/NodeEdge.RData")
+nodelist[complete.cases(nodelist),]
+nodelist[!complete.cases(nodelist),]
+nodelist[99,]
+edgelist[!complete.cases(edgelist),]
+nrow(edgelist[!complete.cases(edgelist),])
+q()
+nrow(edgelist[!complete.cases(edgelist),])
+edgelist[!complete.cases(edgelist),]
+library(dplyr)
+edgelist %>% filter (target=="24825642")
+edgelist %>% filter (target=="24678979 ")
+edgelist %>% filter (target==source)
+edgelist %>% filter (target!=source)
+edgelist[!complete.cases(edgelist),]
+edgelist
+edgelist[!complete.cases(edgelist),]
+edgelist
+edgelist[!complete.cases(edgelist),]
+edgelist
+head(edgelist,200)
+e3
+e4
+e4[complete.cases(e4),]
+e4[!complete.cases(e4),]
+nrow(e4[!complete.cases(e4),])
+temp_repatha_secondary
+str(temp_repatha_secondary)
+temp_repatha_secondary %>% filter(cited_source_uid!="")
+library(dplyr)
+temp_repatha_secondary %>% filter(cited_source_uid!="")
+str(temp_repatha_secondary)
+temp_repatha_secondary %>% filter(cited_source_uid!="") %>% fiter(is.na(pmid_output))
+temp_repatha_secondary %>% filter(cited_source_uid!="") %>% filter(is.na(pmid_output))
+temp_repatha_secondary %>% filter(cited_source_uid!="") %>% filter(!is.na(pmid_output))
+str(temp_repatha_secondary)
+temp_repatha_secondary %>% filter(cited_source_uid!="") %>% filter(pmid!="") %>% filter(!is.na(pmid_output))
+# read in output from repatha2.sql on dev2 (three csv files)#
+# and transform into an edge list and a node list#
+#
+temp_repatha_ct <- read.csv("~/Desktop/temp_repatha_ct.csv",stringsAsFactors=FALSE)#
+temp_repatha_primary <- read.csv("~/Desktop/temp_repatha_primary.csv",stringsAsFactors=FALSE)#
+temp_repatha_secondary <- read.csv("~/Desktop/temp_repatha_secondary.csv",stringsAsFactors=FALSE)#
+temp_repatha_secondary <- temp_repatha_secondary %>% filter(cited_source_uid!="") %>% filter(pmid!="") %>% filter(!is.na(pmid_output))#
+#
+#- Create node list#
+library(dplyr)#
+n1 <- c("Repatha","drug")#
+n2 <- temp_repatha_ct %>% select(nct_id) %>% mutate(ntype="CT")#
+n2 <- rbind(n1,n2)#
+colnames(n2) <- c("nodeID","ntype")#
+n3 <- temp_repatha_primary %>% select(pmid) %>% mutate(ntype="G1")#
+colnames(n3) <- c("nodeID","ntype")#
+n4 <- temp_repatha_secondary %>% select (pmid_output) %>% mutate(ntype="G2")#
+colnames(n4) <- c("nodeID","ntype")#
+n5 <- temp_repatha_primary %>% select(full_project_num_dc) %>% filter(full_project_num_dc!="") %>% mutate(ntype="grant")#
+colnames(n5) <- c("nodeID","ntype")#
+n6 <- temp_repatha_secondary %>% select(full_project_num_dc) %>% filter(full_project_num_dc!="") %>% mutate(ntype="grant")#
+colnames(n6) <- c("nodeID","ntype")#
+n7 <- rbind(e7,e8)#
+n7 %>% select(target) %>% mutate(ntype="inst") %>% unique() %>% nrow()#
+colnames(n7) <-c("nodeID","ntype")#
+nodelist <- rbind(n2,n3,n4,n5,n6,m7)#
+nodelist <- nodelist %>% unique()#
+#
+# suppress duplicates#
+nodelist <- nodelist %>% unique()#
+#
+# create edgelist#
+#master edges- drug to CT#
+e1 <- temp_repatha_ct %>% mutate(source="Repatha") %>% select(source,nct_id)#
+colnames(e1) <- c("source","target")#
+#CT to pmid#
+e2 <- temp_repatha_ct %>% select(nct_id,pmid)#
+colnames(e2) <- c("source","target")#
+# primary pmids to grants#
+e3 <- temp_repatha_primary %>% select (pmid,full_project_num_dc) %>% filter(full_project_num_dc!="")#
+colnames(e3) <- c("source","target")#
+# primary pmids to secondary pmids#
+e4 <- temp_repatha_secondary %>% select(input_pmid,pmid_output) %>% unique() #
+colnames(e4) <- c("source","target")#
+# secondary pmids to grants#
+e5 <- temp_repatha_secondary %>% select(pmid_output,full_project_num_dc) %>% filter(full_project_num_dc!="") %>% unique()#
+colnames(e5) <- c("source","target")#
+e6 <- temp_repatha_primary %>% select(pmid,external_org_id) %>% filter(!is.na(external_org_id)) %>% unique()#
+colnames(e6) <- c("source","target")#
+e7 <- temp_repatha_secondary %>% select(pmid_output,external_org_id) %>% filter(!is.na(external_org_id)) %>% unique() %>% mutate(pEOI=paste("i",external_org_id,sep="")) %>% select(pmid_output,pEOI)#
+colnames(e7) <- c("source","target")#
+e8 <- temp_repatha_primary %>% select(pmid,external_org_id) %>% filter(!is.na(external_org_id)) %>% unique() %>% mutate(pEOI=paste("i",external_org_id,sep="")) %>% select(pmid,pEOI)#
+colnames(e8) <- c("source","target")#
+edgelist <- rbind(e1,e2,e3,e4,e5,e6,e7,e8)#
+#
+# Export#
+write.csv(nodelist,file="~/Desktop/nodelist.csv")#
+write.csv(edgelist,file="~/Desktop/edgelist.csv")#
+save(nodelist,edgelist,file="~/Desktop/NodeEdge.RData")
+source("~/PARDI_Analysis/Repatha/NodeEdgeList.R")
+library(dplyr)
+source("~/PARDI_Analysis/Repatha/NodeEdgeList.R")
+ls()
+edgelist[complete.cases(edgelist),]
+edgelist[!complete.cases(edgelist),]
+nodelist[!complete.cases(nodelist),]
+str(nodelist)
+str(edgelist)
+source("~/PARDI_Analysis/Repatha/NodeEdgeList.R")
+q()
+nodelist[!complete.cases(nodelist),]
+nodelist[is.na(nodelist),]
+q()
+ls()
+e7
+e8
+n7
+# read in output from repatha2.sql on dev2 (three csv files)#
+# and transform into an edge list and a node list#
+#
+temp_repatha_ct <- read.csv("~/Desktop/temp_repatha_ct.csv",stringsAsFactors=FALSE)#
+temp_repatha_primary <- read.csv("~/Desktop/temp_repatha_primary.csv",stringsAsFactors=FALSE)#
+temp_repatha_secondary <- read.csv("~/Desktop/temp_repatha_secondary.csv",stringsAsFactors=FALSE)#
+temp_repatha_secondary <- temp_repatha_secondary %>% filter(cited_source_uid!="") %>% filter(pmid!="") %>% filter(!is.na(pmid_output))#
+#
+#- Create node list#
+library(dplyr)#
+n1 <- c("Repatha","drug")#
+n2 <- temp_repatha_ct %>% select(nct_id) %>% mutate(ntype="CT")#
+n2 <- rbind(n1,n2)#
+colnames(n2) <- c("nodeID","ntype")#
+n3 <- temp_repatha_primary %>% select(pmid) %>% mutate(ntype="G1")#
+colnames(n3) <- c("nodeID","ntype")#
+n4 <- temp_repatha_secondary %>% select (pmid_output) %>% mutate(ntype="G2")#
+colnames(n4) <- c("nodeID","ntype")#
+n5 <- temp_repatha_primary %>% select(full_project_num_dc) %>% filter(full_project_num_dc!="") %>% mutate(ntype="grant")#
+colnames(n5) <- c("nodeID","ntype")#
+n6 <- temp_repatha_secondary %>% select(full_project_num_dc) %>% filter(full_project_num_dc!="") %>% mutate(ntype="grant")#
+colnames(n6) <- c("nodeID","ntype")#
+n7 <- rbind(e7,e8)#
+n7 <- n7 %>% select(target) %>% mutate(ntype="inst") %>% unique() %>% nrow()#
+colnames(n7) <-c("nodeID","ntype")#
+nodelist <- rbind(n2,n3,n4,n5,n6,n7)#
+nodelist <- nodelist %>% unique()#
+#
+# suppress duplicates#
+nodelist <- nodelist %>% unique()#
+#
+# create edgelist#
+#master edges- drug to CT#
+e1 <- temp_repatha_ct %>% mutate(source="Repatha") %>% select(source,nct_id)#
+colnames(e1) <- c("source","target")#
+#CT to pmid#
+e2 <- temp_repatha_ct %>% select(nct_id,pmid)#
+colnames(e2) <- c("source","target")#
+# primary pmids to grants#
+e3 <- temp_repatha_primary %>% select (pmid,full_project_num_dc) %>% filter(full_project_num_dc!="")#
+colnames(e3) <- c("source","target")#
+# primary pmids to secondary pmids#
+e4 <- temp_repatha_secondary %>% select(input_pmid,pmid_output) %>% unique() #
+colnames(e4) <- c("source","target")#
+# secondary pmids to grants#
+e5 <- temp_repatha_secondary %>% select(pmid_output,full_project_num_dc) %>% filter(full_project_num_dc!="") %>% unique()#
+colnames(e5) <- c("source","target")#
+e6 <- temp_repatha_primary %>% select(pmid,external_org_id) %>% filter(!is.na(external_org_id)) %>% unique()#
+colnames(e6) <- c("source","target")#
+e7 <- temp_repatha_secondary %>% select(pmid_output,external_org_id) %>% filter(!is.na(external_org_id)) %>% unique() %>% mutate(pEOI=paste("i",external_org_id,sep="")) %>% select(pmid_output,pEOI)#
+colnames(e7) <- c("source","target")#
+e8 <- temp_repatha_primary %>% select(pmid,external_org_id) %>% filter(!is.na(external_org_id)) %>% unique() %>% mutate(pEOI=paste("i",external_org_id,sep="")) %>% select(pmid,pEOI)#
+colnames(e8) <- c("source","target")#
+edgelist <- rbind(e1,e2,e3,e4,e5,e6,e7,e8)#
+#
+# Export#
+write.csv(nodelist,file="~/Desktop/nodelist.csv")#
+write.csv(edgelist,file="~/Desktop/edgelist.csv")#
+save(nodelist,edgelist,file="~/Desktop/NodeEdge.RData")
+n7
+# read in output from repatha2.sql on dev2 (three csv files)#
+# and transform into an edge list and a node list#
+#
+temp_repatha_ct <- read.csv("~/Desktop/temp_repatha_ct.csv",stringsAsFactors=FALSE)#
+temp_repatha_primary <- read.csv("~/Desktop/temp_repatha_primary.csv",stringsAsFactors=FALSE)#
+temp_repatha_secondary <- read.csv("~/Desktop/temp_repatha_secondary.csv",stringsAsFactors=FALSE)#
+temp_repatha_secondary <- temp_repatha_secondary %>% filter(cited_source_uid!="") %>% filter(pmid!="") %>% filter(!is.na(pmid_output))#
+#
+#- Create node list#
+library(dplyr)#
+n1 <- c("Repatha","drug")#
+n2 <- temp_repatha_ct %>% select(nct_id) %>% mutate(ntype="CT")#
+n2 <- rbind(n1,n2)#
+colnames(n2) <- c("nodeID","ntype")#
+n3 <- temp_repatha_primary %>% select(pmid) %>% mutate(ntype="G1")#
+colnames(n3) <- c("nodeID","ntype")#
+n4 <- temp_repatha_secondary %>% select (pmid_output) %>% mutate(ntype="G2")#
+colnames(n4) <- c("nodeID","ntype")#
+n5 <- temp_repatha_primary %>% select(full_project_num_dc) %>% filter(full_project_num_dc!="") %>% mutate(ntype="grant")#
+colnames(n5) <- c("nodeID","ntype")#
+n6 <- temp_repatha_secondary %>% select(full_project_num_dc) %>% filter(full_project_num_dc!="") %>% mutate(ntype="grant")#
+colnames(n6) <- c("nodeID","ntype")#
+n7 <- rbind(e7,e8)#
+n7 <- n7 %>% select(target) %>% mutate(ntype="inst") %>% unique()#
+colnames(n7) <-c("nodeID","ntype")#
+nodelist <- rbind(n2,n3,n4,n5,n6,n7)#
+nodelist <- nodelist %>% unique()#
+#
+# suppress duplicates#
+nodelist <- nodelist %>% unique()#
+#
+# create edgelist#
+#master edges- drug to CT#
+e1 <- temp_repatha_ct %>% mutate(source="Repatha") %>% select(source,nct_id)#
+colnames(e1) <- c("source","target")#
+#CT to pmid#
+e2 <- temp_repatha_ct %>% select(nct_id,pmid)#
+colnames(e2) <- c("source","target")#
+# primary pmids to grants#
+e3 <- temp_repatha_primary %>% select (pmid,full_project_num_dc) %>% filter(full_project_num_dc!="")#
+colnames(e3) <- c("source","target")#
+# primary pmids to secondary pmids#
+e4 <- temp_repatha_secondary %>% select(input_pmid,pmid_output) %>% unique() #
+colnames(e4) <- c("source","target")#
+# secondary pmids to grants#
+e5 <- temp_repatha_secondary %>% select(pmid_output,full_project_num_dc) %>% filter(full_project_num_dc!="") %>% unique()#
+colnames(e5) <- c("source","target")#
+e6 <- temp_repatha_primary %>% select(pmid,external_org_id) %>% filter(!is.na(external_org_id)) %>% unique()#
+colnames(e6) <- c("source","target")#
+e7 <- temp_repatha_secondary %>% select(pmid_output,external_org_id) %>% filter(!is.na(external_org_id)) %>% unique() %>% mutate(pEOI=paste("i",external_org_id,sep="")) %>% select(pmid_output,pEOI)#
+colnames(e7) <- c("source","target")#
+e8 <- temp_repatha_primary %>% select(pmid,external_org_id) %>% filter(!is.na(external_org_id)) %>% unique() %>% mutate(pEOI=paste("i",external_org_id,sep="")) %>% select(pmid,pEOI)#
+colnames(e8) <- c("source","target")#
+edgelist <- rbind(e1,e2,e3,e4,e5,e6,e7,e8)#
+#
+# Export#
+write.csv(nodelist,file="~/Desktop/nodelist.csv")#
+write.csv(edgelist,file="~/Desktop/edgelist.csv")#
+save(nodelist,edgelist,file="~/Desktop/NodeEdge.RData")
+n7
+ls()
+source("~/PARDI_Analysis/Repatha/NodeEdgeList.R")
+library(dplyr)
+source("~/PARDI_Analysis/Repatha/NodeEdgeList.R")
+ls()
+# read in output from repatha2.sql on dev2 (three csv files)#
+# and transform into an edge list and a node list#
+#
+temp_repatha_ct <- read.csv("~/Desktop/temp_repatha_ct.csv",stringsAsFactors=FALSE)#
+temp_repatha_primary <- read.csv("~/Desktop/temp_repatha_primary.csv",stringsAsFactors=FALSE)#
+temp_repatha_secondary <- read.csv("~/Desktop/temp_repatha_secondary.csv",stringsAsFactors=FALSE)#
+temp_repatha_secondary <- temp_repatha_secondary %>% filter(cited_source_uid!="") %>% filter(pmid!="") %>% filter(!is.na(pmid_output))#
+#
+# start building edgelist#
+#master edges- drug to clinical trials CT#
+e1 <- temp_repatha_ct %>% mutate(source="Repatha") %>% select(source,nct_id)#
+colnames(e1) <- c("source","target")#
+#
+#CT to pmid (CT to G1)#
+e2 <- temp_repatha_ct %>% select(nct_id,pmid)#
+colnames(e2) <- c("source","target")#
+#
+# primary pmids to grants (G1 to grants)#
+e3 <- temp_repatha_primary %>% select (pmid,full_project_num_dc) %>% filter(full_project_num_dc!="")#
+colnames(e3) <- c("source","target")#
+#
+# primary pmids to secondary pmids (G1 to G2)#
+e4 <- temp_repatha_secondary %>% select(input_pmid,pmid_output) %>% unique() #
+colnames(e4) <- c("source","target")#
+#
+# secondary pmids to grants#
+e5 <- temp_repatha_secondary %>% select(pmid_output,full_project_num_dc) %>% filter(full_project_num_dc!="") %>% unique()#
+colnames(e5) <- c("source","target")#
+#
+# primary pmids to external org ids (EOI)#
+e6 <- temp_repatha_primary %>% select(pmid,external_org_id) %>% filter(!is.na(external_org_id)) %>% unique() %>% mutate(pEOI=paste("i",external_org_id,sep="")) %>% select(pmid,pEOI)#
+colnames(e6) <- c("source","target")#
+#
+# secondary pmids to external org ids (EOI)#
+e7 <- temp_repatha_secondary %>% select(pmid_output,external_org_id) %>% filter(is.na(external_org_id)) %>% unique() %>% mutate(pEOI=paste("i",external_org_id,sep="")) %>% select(pmid_output,pEOI)#
+colnames(e7) <- c("source","target")#
+#
+#assemble edgelist#
+edgelist <- rbind(e1,e2,e3,e4,e5,e6,e7) #
+edgelist <- edgelist %>% unique()#
+#
+#- Create node list#
+library(dplyr)#
+#
+# Root node#
+n1 <- c("Repatha","drug")#
+#
+# nct_nodes, merge with root node#
+n2 <- temp_repatha_ct %>% select(nct_id) %>% mutate(ntype="CT")#
+n2 <- rbind(n1,n2)#
+colnames(n2) <- c("nodeID","ntype")#
+#
+# pmids associated with nct_ids (G1 pmids)#
+n3_1 <- temp_repatha_ct %>% select(pmid) %>% mutate(ntype="G1")#
+n3 <- temp_repatha_primary %>% select(pmid) %>% mutate(ntype="G1")#
+n3 <- rbind(n3_1,n3)#
+colnames(n3) <- c("nodeID","ntype")#
+#
+# cited pmids (G2 pmids)#
+n4 <- temp_repatha_secondary %>% select (pmid_output) %>% mutate(ntype="G2")#
+colnames(n4) <- c("nodeID","ntype")#
+#
+# grants (associated with G1)#
+n5 <- temp_repatha_primary %>% select(full_project_num_dc) %>% filter(full_project_num_dc!="") %>% mutate(ntype="grant")#
+colnames(n5) <- c("nodeID","ntype")#
+#
+# grants (associated with G2)#
+n6 <- temp_repatha_secondary %>% select(full_project_num_dc) %>% filter(full_project_num_dc!="") %>% mutate(ntype="grant")#
+colnames(n6) <- c("nodeID","ntype")#
+#
+# institutions (associated with G1 and G2)#
+n7 <- rbind(e6,e7)#
+n7 <- n7 %>% select(target) %>% mutate(ntype="inst") %>% unique()#
+colnames(n7) <-c("nodeID","ntype")#
+#
+#assemble all#
+nodelist <- rbind(n2,n3,n4,n5,n6,n7)#
+nodelist <- nodelist %>% unique()#
+#
+# Export#
+write.csv(nodelist,file="~/Desktop/nodelist.csv")#
+write.csv(edgelist,file="~/Desktop/edgelist.csv")#
+save(nodelist,edgelist,file="~/Desktop/NodeEdge.RData")
+edgelist
+temp_repatha_primary %>% select(pmid,external_org_id) %>% filter(!is.na(external_org_id)) %>% unique() %>% mutate(pEOI=paste("i",external_org_id,sep="")) %>% select(pmid,pEOI)
+temp_repatha_secondary %>% select(pmid_output,external_org_id) %>% filter(is.na(external_org_id)) %>% unique() %>% mutate(pEOI=paste("i",external_org_id,sep="")) %>% select(pmid_output,pEOI)
+temp_repatha_secondary %>% select(pmid_output,external_org_id) %>% filter(!is.na(external_org_id)) %>% unique() %>% mutate(pEOI=paste("i",external_org_id,sep="")) %>% select(pmid_output,pEOI)
+# read in output from repatha2.sql on dev2 (three csv files)#
+# and transform into an edge list and a node list#
+#
+temp_repatha_ct <- read.csv("~/Desktop/temp_repatha_ct.csv",stringsAsFactors=FALSE)#
+temp_repatha_primary <- read.csv("~/Desktop/temp_repatha_primary.csv",stringsAsFactors=FALSE)#
+temp_repatha_secondary <- read.csv("~/Desktop/temp_repatha_secondary.csv",stringsAsFactors=FALSE)#
+temp_repatha_secondary <- temp_repatha_secondary %>% filter(cited_source_uid!="") %>% filter(pmid!="") %>% filter(!is.na(pmid_output))#
+#
+# start building edgelist#
+#master edges- drug to clinical trials CT#
+e1 <- temp_repatha_ct %>% mutate(source="Repatha") %>% select(source,nct_id)#
+colnames(e1) <- c("source","target")#
+#
+#CT to pmid (CT to G1)#
+e2 <- temp_repatha_ct %>% select(nct_id,pmid)#
+colnames(e2) <- c("source","target")#
+#
+# primary pmids to grants (G1 to grants)#
+e3 <- temp_repatha_primary %>% select (pmid,full_project_num_dc) %>% filter(full_project_num_dc!="")#
+colnames(e3) <- c("source","target")#
+#
+# primary pmids to secondary pmids (G1 to G2)#
+e4 <- temp_repatha_secondary %>% select(input_pmid,pmid_output) %>% unique() #
+colnames(e4) <- c("source","target")#
+#
+# secondary pmids to grants#
+e5 <- temp_repatha_secondary %>% select(pmid_output,full_project_num_dc) %>% filter(full_project_num_dc!="") %>% unique()#
+colnames(e5) <- c("source","target")#
+#
+# primary pmids to external org ids (EOI)#
+e6 <- temp_repatha_primary %>% select(pmid,external_org_id) %>% filter(!is.na(external_org_id)) %>% unique() %>% mutate(pEOI=paste("i",external_org_id,sep="")) %>% select(pmid,pEOI)#
+colnames(e6) <- c("source","target")#
+#
+# secondary pmids to external org ids (EOI)#
+e7 <- temp_repatha_secondary %>% select(pmid_output,external_org_id) %>% filter(!is.na(external_org_id)) %>% unique() %>% mutate(pEOI=paste("i",external_org_id,sep="")) %>% select(pmid_output,pEOI)#
+colnames(e7) <- c("source","target")#
+#
+#assemble edgelist#
+edgelist <- rbind(e1,e2,e3,e4,e5,e6,e7) #
+edgelist <- edgelist %>% unique()#
+#
+#- Create node list#
+library(dplyr)#
+#
+# Root node#
+n1 <- c("Repatha","drug")#
+#
+# nct_nodes, merge with root node#
+n2 <- temp_repatha_ct %>% select(nct_id) %>% mutate(ntype="CT")#
+n2 <- rbind(n1,n2)#
+colnames(n2) <- c("nodeID","ntype")#
+#
+# pmids associated with nct_ids (G1 pmids)#
+n3_1 <- temp_repatha_ct %>% select(pmid) %>% mutate(ntype="G1")#
+n3 <- temp_repatha_primary %>% select(pmid) %>% mutate(ntype="G1")#
+n3 <- rbind(n3_1,n3)#
+colnames(n3) <- c("nodeID","ntype")#
+#
+# cited pmids (G2 pmids)#
+n4 <- temp_repatha_secondary %>% select (pmid_output) %>% mutate(ntype="G2")#
+colnames(n4) <- c("nodeID","ntype")#
+#
+# grants (associated with G1)#
+n5 <- temp_repatha_primary %>% select(full_project_num_dc) %>% filter(full_project_num_dc!="") %>% mutate(ntype="grant")#
+colnames(n5) <- c("nodeID","ntype")#
+#
+# grants (associated with G2)#
+n6 <- temp_repatha_secondary %>% select(full_project_num_dc) %>% filter(full_project_num_dc!="") %>% mutate(ntype="grant")#
+colnames(n6) <- c("nodeID","ntype")#
+#
+# institutions (associated with G1 and G2)#
+n7 <- rbind(e6,e7)#
+n7 <- n7 %>% select(target) %>% mutate(ntype="inst") %>% unique()#
+colnames(n7) <-c("nodeID","ntype")#
+#
+#assemble all#
+nodelist <- rbind(n2,n3,n4,n5,n6,n7)#
+nodelist <- nodelist %>% unique()#
+#
+# Export#
+write.csv(nodelist,file="~/Desktop/nodelist.csv")#
+write.csv(edgelist,file="~/Desktop/edgelist.csv")#
+save(nodelist,edgelist,file="~/Desktop/NodeEdge.RData")
+edgelist
+nodelist
+c(edgelist$source,edgelist$target)
+unique(c(edgelist$source,edgelist$target))
+t <- unique(c(edgelist$source,edgelist$target))
+nodelist$nodeID
+setdiff(nodelist$nodeID,t)
+nodelist %>% filter(nodeID=="10712828")
+source("~/PARDI_Analysis/Repatha/NodeEdgeList.R")
+t <- unique(c(edgelist$source,edgelist$target))
+setdiff(nodelist$nodeID,t)
+library(networkd3)
+library(networkD3)
+simplenetwork(edgelist)
+simpleNetwork(edgelist)
+q()
+library(dplyr)
+nodelist %>% group_by(ntype)
+nodelist %>% group_by(ntype) %>% length(nodeID)
+nodelist %>% group_by(ntype) %>% summarise(length(nodeID)()
+)
+nodelist %>% group_by(ntype) %>% summarise(length(nodeID))
+ls()
+temp_repatha_ct
+temp_repatha_primary
+temp_repatha_secondary
+q()
+q
+q()
+ls()
+save(temp_repatha_ct,temp_repatha_primary,temp_repatha_secondary,file="Lauer.RData")
+getwd()
+q()
+list()
+?(list)
+?list
+?unlist
+ls()
+dir()
+t <- list(dir())
+str(t)
+rm(t)
+ls()
+t <- ls()
+t
+rm(t)
+list(ls(pattern='data.fra*'))
+ls(pattern='data.fra*')
+ls()
+ls
+ls()
+nodelist
+q()
+rm(list=ls())
+q()
+ls()
+q()
+ls()
+q()
+ls()
+clear
+ls()
+exit
+q()
+read.csv9("~/Desktop/temp_scopus.csv",header=true)
+read.csv("~/Desktop/temp_scopus.csv",header=true)
+read.csv("~/Desktop/temp_scopus.csv",header=T)
+q
+;
+ls()
+ls
+q()
+ls()
+ls()
+ls
+ls
+ls()
+ls()
+ls()
+# George Chacko 4/18/2016#
+# copies SQL combined_repatha.sql output into R dataframes  #
+# generates a nodelist and edgelist as input for igraph#
+# requires as input three files in /tmp that are generated by the #
+# combined_repatha.sql script in the pardi_pico branch of the #
+# PARDI_Analysis script.>#
+#
+# temp_repatha_citg1_spires.csv#
+# temp_repatha_citg2_spires.csv#
+# temp_repatha_patents_pmid.csv#
+#
+setwd("~/bibliometrics")#
+if(file.exists("graph")) {system("rm -fr graph")}#
+system("mkdir graph")#
+setwd("~/bibliometrics/graph")#
+system("cp /tmp/temp_repatha*.csv .")#
+temp_repatha_filelist <- as.list(dir())#
+temp_repatha_list <- vector("list",length=length(temp_repatha_filelist))#
+for (i in 1:length(temp_repatha_filelist)) {#
+temp_repatha_list[[i]] <- read.csv(temp_repatha_filelist[[i]],header=T,stringsAsFactors=FALSE)#
+}#
+#
+library(dplyr)#
+temp <- temp_repatha_list#
+#
+# subset into ct,seedset, and patents and link to root(Repatha)#
+# drug to NCT and NCT to pmid#
+t <- temp[[1]]#
+ct_pmids <- t %>% select(source,target=citg1) %>% filter(substring(source,1,3)=="NCT") %>% mutate(stype="ct",ttype="pmidG1")#
+drug_ct <- ct_pmids %>% select(target=source) %>% mutate(source="Repatha") %>% mutate(stype="drug",ttype="ct") %>% select(source,target,stype,ttype)#
+#
+# drug to pmids#
+drug_pmids <- t %>% select(source,citg1) %>% filter(source=="seedset") %>% select(citg1) %>% mutate(source="Repatha",stype="drug",ttype="pmidG1") %>% select (source,target=citg1,stype,ttype) %>% unique()#
+#
+# drug to patents and patents to pmids#
+drug_patents <- t %>% select(source,citg1) %>% filter(substring(source,1,2)=="US") %>% select(target=source) %>% mutate(source="Repatha") %>% select(source,target) %>% mutate(stype="drug",ttype="patent")#
+patents_pmids <- t %>% select(source,target=citg1) %>% filter(substring(source,1,2)=="US") %>% filter(!is.na(target)) %>% mutate(stype="patent",ttype="pmidG1")#
+#
+# pmidG1 to pmidG2#
+# combining drug-ct-seedset-patents relationships#
+edgelist1 <- rbind(drug_ct,ct_pmids,drug_pmids,drug_patents,patents_pmids) %>% unique()#
+edgelist2 <- temp[[2]] %>% select(source=input_pmid,target=pmid_output) %>% unique() %>% mutate(stype="pmidG1",ttype="pmidG2")#
+#
+pmidG1_spires <- temp[[1]] %>% select(citg1,full_project_num_dc,admin_phs_org_code,match_case,external_org_id,index_name) %>% filter(match_case>=4) %>% filter(external_org_id!="")#
+edgelist3 <- pmidG1_spires %>% select(source=citg1,target=full_project_num_dc) %>% mutate(stype="pmidG1",ttype="grant")#
+edgelist4 <- pmidG1_spires %>% select(source=citg1,target=external_org_id) %>% mutate(stype="pmidG1",ttype="inst")#
+#
+pmidG2_spires <- temp[[2]] %>% select(pmid_output,full_project_num_dc,full_project_num_dc,match_case,external_org_id,index_name) %>% filter(match_case>=4) %>% filter(external_org_id!="")#
+edgelist5 <- pmidG2_spires %>% select(source=pmid_output,target=full_project_num_dc) %>% mutate(stype="pmidG2",ttype="grant")#
+edgelist6 <- pmidG2_spires %>% select(source=pmid_output,target=external_org_id) %>% mutate(stype="pmidG2",ttype="inst")#
+#
+complete_edgelist <- rbind(edgelist1,edgelist2,edgelist3,edgelist4,edgelist5,edgelist6) %>% unique()#
+#
+# building nodelist#
+sourcenodelist <- complete_edgelist %>% select(node=source,ntype=stype)#
+targetnodelist <- complete_edgelist %>% select(node=target,ntype=ttype)#
+complete_nodelist <- rbind(sourcenodelist,targetnodelist)#
+complete_nodelist <- complete_nodelist %>% unique()#
+save.image()#
+save(complete_nodelist,complete_edgelist,file="/tmp/LindsayGrapher.RData")
+q()

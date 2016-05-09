@@ -1,0 +1,68 @@
+create patents awarded to drug***
+DROP TABLE
+CREATE TABLE
+INSERT 0 1
+INSERT 0 1
+getting patents cited by Repatha patents (G2)
+DROP TABLE
+SELECT 367
+combining into single list of patent_numbers aka drug_patents***
+DROP TABLE
+SELECT 367
+INSERT 0 2
+retrieve wosids for patents (contains elegant Shixin construct)***
+DROP TABLE
+SELECT 955
+joining on wos_pmid_mapping to get pmids **
+DROP TABLE
+SELECT 955
+mapping pmids to grants via SPIRES***
+DROP TABLE
+SELECT 1389
+loading seedset pmids ***
+DROP TABLE
+CREATE TABLE
+COPY 59
+search for repatha in CT tables in PARDI and identify pmids from cited references in ct_references***
+DROP TABLE
+SELECT 16
+combine distinct pmids from temp_repatha_ct and temp_repatha1***
+DROP TABLE
+CREATE TABLE
+INSERT 0 59
+INSERT 0 9
+primary matches against SPIRES***
+DROP TABLE
+SELECT 90
+getting corresponding wos_uids aka source_ids***
+DROP TABLE
+SELECT 68
+adding manually discovered wos_uids by GUI search***
+UPDATE 1
+UPDATE 1
+UPDATE 1
+UPDATE 1
+UPDATE 1
+UPDATE 1
+UPDATE 6
+getting cited references from wos_references table***
+DROP TABLE
+SELECT 2834
+COPY 2834
+Cleaning WOS IDs on temp_repatha3...***
+UPDATE 2834
+mapping back to pmids***
+DROP TABLE
+SELECT 2834
+UPDATE 35
+UPDATE 35
+mapping pmid output to SPIRES for grants data***
+DROP TABLE
+SELECT 4069
+export all relevant tables to /tmp***
+COPY 16
+COPY 90
+COPY 4069
+COPY 2
+COPY 367
+COPY 1389

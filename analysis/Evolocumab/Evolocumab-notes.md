@@ -1,8 +1,64 @@
 ####Evolocumab-FDA-NDA-Medical.txt
-As of July 30, 2015, evolocumab (Repatha) has not been approved by FDA, but there are plenty of references to work with in the clicinal trials, the FDA Briefing Document, and Amgen press release:
+
+As of July 30, 2015, evolocumab (Repatha) has not been approved by FDA, but there are plenty of references to work with in the clinical trials, the FDA Briefing Document, and Amgen press release:
 * https://clinicaltrials.gov/ct2/results?term=evolocumab&Search=Search
 * http://www.fda.gov/downloads/AdvisoryCommittees/CommitteesMeetingMaterials/Drugs/EndocrinologicandMetabolicDrugsAdvisoryCommittee/UCM450072.pdf
 * http://www.amgen.com/media/news-releases/2014/11/fda-accepts-amgens-biologics-license-application-for-ldl-cholesterollowering-medication-evolocumab/
+
+Evolocumab has since been approved and I found the following link on 3/29/2016 
+* http://www.accessdata.fda.gov/scripts/cder/drugsatfda/index.cfm?fuseaction=Search.Label_ApprovalHistory#apphist
+
+I'll hazard a guess that that before approval, Advisory Committee notes are more useful to identify presumably influential papers and maybe after approval too. In addition, they include non-clinical review. However, human judgment must be exercised and is critical in identifying foundational publications.
+
+In March 2016:
+
+1. Foundational References: Start with a txt file into which you paste references copied one a time from the [Advisory Committee Review document](http://www.fda.gov/downloads/AdvisoryCommittees/CommitteesMeetingMaterials/Drugs/EndocrinologicandMetabolicDrugsAdvisoryCommittee/UCM450072.pdf). This process is time consuming but involves critical human judgment. In the case of Repatha, I also looked at the [Medical Review Document](http://www.accessdata.fda.gov/scripts/cder/drugsatfda/index.cfm?fuseaction=Search.Label_ApprovalHistory#apphist) (which lacks the non clinical review), the [Advisory Committee report](http://www.fda.gov/downloads/AdvisoryCommittees/CommitteesMeetingMaterials/Drugs/EndocrinologicandMetabolicDrugsAdvisoryCommittee/UCM450072.pdf) and an [Amgen PR document] (http://www.amgen.com/media/news-releases/2014/11/fda-accepts-amgens-biologics-license-application-for-ldl-cholesterollowering-medication-evolocumab/) as per Alex Pico. In fact, the combination of Advisory Committee notes and PR document provided the best dataset.  I manually number the references and edit out the umlaut and diacritics etc. Then I *manually search PubMED* and recover pmids for this seed set. This involves more human judgment, which cannot be easily substituted for but a combination of at least one author, most of the title, and the journal name usually gets you what you want. We're working on developing an algorithm to automate this search strategy- stay tuned. The resultant dataset is named ev\_fda\_foundational. At this point, I import it into R and submit a Rentrez request to retrieve stuctured data via the seedset.R script, which generates a dataframe named ev\_fda\_foundational that serves as a reference point to start from. It would be very useful if the FDA would insisted on a machine readable list of uids and correctly formatted citations in *plain text* and made them avialable to the public.
+2. Run a PubMed search for evolocumab using various search terms and combine the output into a single R dataframe ev\_pubmed\_all that contains pmids. 130 in this case, which is identical to just searching for all evolocumab in PubMed but YMMV depending on how recently your drug/biologic of interest was released. 
+3. Search clinicaltrials.gov for evolocumab. We have downloaded the full XML dataset (we refresh it weekly) and parsed it into PostgreSQL. Thus we query ct\_interventions for instances of the string "evolocumab" and retrieve corresponding nct\_ids. These nct\_ids are then used to retrieve publications and references, which are combined into a three-column table. nct_id, pmid, pub\_or\_reference.
+4. Search USPTO and Derwent Patent Citation Index. We downloaded the full USPTO dataset and also loaded the Derwent Patent Citation Index so that we could search by patent number. A Google search for evolocumab, revealed litigation between [Amgen and Sanofi](http://patentdocs.typepad.com/files/amgen-v-sanofi-1.pdf) and the court judgment provided the patent numbers that I used to search our USPTO and Derwent tables for 8871913 and 8871914. This resulted in cited patents and cited non-patent litearature (npl) that we used to fish out WoS uids and from there to PubMed to NIH grants.
+
+
+Then I preprocess with sed and import into R as a two column dataframe (df), use dplyr to clean up null values and add a new cleaned up column "ncit_text"
+
+In bash
+
+```
+cat evolocumab3  | sed -E 's/^[0-9]{1,2}\./+/' | sed -E '/^\s*$/d' > evolocumab4
+```
+
+In R
+
+```
+df <- read.csv("~/evolocumab4",header=FALSE,sep="+", stringsAsFactors=FALSE)
+colnames(df) <- c("blank","cit_text")
+library(dplyr)
+df <- df %>% select(cit_text) %>% mutate(ncit_text=ifelse(cit_text=="","BINGO",cit_text))
+```
+
+and then run the nplcit_pubmed_search function I wrote
+
+```
+nplcit\_pubmed\_search(substring(t$ncit_text,1,220))
+```
+
+which generates a list of vectors. This protocol needs some fine tuning.
+
+``` 
+{r nplcit\_pubmed\_search} nplcit_pubmed_search <- function (x)	{
+print(length(x))
+nplcit_list <- vector("list",length(x))
+library(rentrez)
+for (i in 1:length(x)){	
+t<- entrez_search(db="pubmed", term=x[i],retstart=0,retmax=3)	
+nplcit_list[[i]] <- t$ids	
+print(i)
+print(t$ids)
+rm(t)
+}
+print(nplcit_list)
+return(nplcit_list)
+}
+``` 
 
 ####Evolocumab-core.pklz
 ```
